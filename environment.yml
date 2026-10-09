@@ -5,9 +5,10 @@ dependencies:
 - pyiron_workflow =0.17.0
 - pyironflow =0.0.24
 - python-workflow-definition =0.1.5
-- ase=3.29.0
-- matplotlib=3.11.1
-- xmlschema=4.3.2
-- optimade=1.5.0
-- qe=7.5
-- qe-tools=2.0.0
+- ase =3.29.0
+- matplotlib =3.11.1
+- xmlschema =4.3.2
+- optimade =1.5.0
+- qe =7.5
+- qe-tools =2.0.0
+- conda_subprocess =0.0.12
