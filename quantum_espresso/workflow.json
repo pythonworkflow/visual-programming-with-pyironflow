@@ -1,0 +1,559 @@
+{
+  "version": "0.1.0",
+  "nodes": [
+    {
+      "id": 0,
+      "type": "function",
+      "value": "workflow.get_bulk_structure"
+    },
+    {
+      "id": 1,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_dict"
+    },
+    {
+      "id": 2,
+      "type": "function",
+      "value": "workflow.calculate_qe"
+    },
+    {
+      "id": 3,
+      "type": "function",
+      "value": "workflow.generate_structures"
+    },
+    {
+      "id": 4,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_dict"
+    },
+    {
+      "id": 5,
+      "type": "function",
+      "value": "workflow.calculate_qe"
+    },
+    {
+      "id": 6,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_dict"
+    },
+    {
+      "id": 7,
+      "type": "function",
+      "value": "workflow.calculate_qe"
+    },
+    {
+      "id": 8,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_dict"
+    },
+    {
+      "id": 9,
+      "type": "function",
+      "value": "workflow.calculate_qe"
+    },
+    {
+      "id": 10,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_dict"
+    },
+    {
+      "id": 11,
+      "type": "function",
+      "value": "workflow.calculate_qe"
+    },
+    {
+      "id": 12,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_dict"
+    },
+    {
+      "id": 13,
+      "type": "function",
+      "value": "workflow.calculate_qe"
+    },
+    {
+      "id": 14,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_list"
+    },
+    {
+      "id": 15,
+      "type": "function",
+      "value": "python_workflow_definition.shared.get_list"
+    },
+    {
+      "id": 16,
+      "type": "function",
+      "value": "workflow.plot_energy_volume_curve"
+    },
+    {
+      "id": 17,
+      "type": "input",
+      "name": "element",
+      "value": "Al"
+    },
+    {
+      "id": 18,
+      "type": "input",
+      "name": "a",
+      "value": 4.04
+    },
+    {
+      "id": 19,
+      "type": "input",
+      "name": "cubic",
+      "value": true
+    },
+    {
+      "id": 20,
+      "type": "input",
+      "name": "pseudopotentials",
+      "value": {
+        "Al": "Al.pbe-n-kjpaw_psl.1.0.0.UPF"
+      }
+    },
+    {
+      "id": 21,
+      "type": "input",
+      "name": "kpts",
+      "value": [
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "id": 22,
+      "type": "input",
+      "name": "calculation_0",
+      "value": "vc-relax"
+    },
+    {
+      "id": 23,
+      "type": "input",
+      "name": "smearing",
+      "value": 0.02
+    },
+    {
+      "id": 24,
+      "type": "input",
+      "name": "working_directory_0",
+      "value": "mini"
+    },
+    {
+      "id": 25,
+      "type": "input",
+      "name": "strain_lst",
+      "value": [
+        0.9,
+        0.9500000000000001,
+        1.0,
+        1.05,
+        1.1
+      ]
+    },
+    {
+      "id": 26,
+      "type": "input",
+      "name": "calculation_1",
+      "value": "scf"
+    },
+    {
+      "id": 27,
+      "type": "input",
+      "name": "working_directory_1",
+      "value": "strain_0"
+    },
+    {
+      "id": 28,
+      "type": "input",
+      "name": "working_directory_2",
+      "value": "strain_1"
+    },
+    {
+      "id": 29,
+      "type": "input",
+      "name": "working_directory_3",
+      "value": "strain_2"
+    },
+    {
+      "id": 30,
+      "type": "input",
+      "name": "working_directory_4",
+      "value": "strain_3"
+    },
+    {
+      "id": 31,
+      "type": "input",
+      "name": "working_directory_5",
+      "value": "strain_4"
+    },
+    {
+      "id": 32,
+      "type": "output",
+      "name": "result"
+    }
+  ],
+  "edges": [
+    {
+      "target": 3,
+      "targetPort": "structure",
+      "source": 2,
+      "sourcePort": "structure"
+    },
+    {
+      "target": 12,
+      "targetPort": "structure",
+      "source": 3,
+      "sourcePort": "s_4"
+    },
+    {
+      "target": 10,
+      "targetPort": "structure",
+      "source": 3,
+      "sourcePort": "s_3"
+    },
+    {
+      "target": 8,
+      "targetPort": "structure",
+      "source": 3,
+      "sourcePort": "s_2"
+    },
+    {
+      "target": 6,
+      "targetPort": "structure",
+      "source": 3,
+      "sourcePort": "s_1"
+    },
+    {
+      "target": 4,
+      "targetPort": "structure",
+      "source": 3,
+      "sourcePort": "s_0"
+    },
+    {
+      "target": 15,
+      "targetPort": "0",
+      "source": 5,
+      "sourcePort": "energy"
+    },
+    {
+      "target": 14,
+      "targetPort": "0",
+      "source": 5,
+      "sourcePort": "volume"
+    },
+    {
+      "target": 15,
+      "targetPort": "1",
+      "source": 7,
+      "sourcePort": "energy"
+    },
+    {
+      "target": 14,
+      "targetPort": "1",
+      "source": 7,
+      "sourcePort": "volume"
+    },
+    {
+      "target": 15,
+      "targetPort": "2",
+      "source": 9,
+      "sourcePort": "energy"
+    },
+    {
+      "target": 14,
+      "targetPort": "2",
+      "source": 9,
+      "sourcePort": "volume"
+    },
+    {
+      "target": 15,
+      "targetPort": "3",
+      "source": 11,
+      "sourcePort": "energy"
+    },
+    {
+      "target": 14,
+      "targetPort": "3",
+      "source": 11,
+      "sourcePort": "volume"
+    },
+    {
+      "target": 15,
+      "targetPort": "4",
+      "source": 13,
+      "sourcePort": "energy"
+    },
+    {
+      "target": 14,
+      "targetPort": "4",
+      "source": 13,
+      "sourcePort": "volume"
+    },
+    {
+      "target": 1,
+      "targetPort": "structure",
+      "source": 0,
+      "sourcePort": null
+    },
+    {
+      "target": 2,
+      "targetPort": "input_dict",
+      "source": 1,
+      "sourcePort": null
+    },
+    {
+      "target": 5,
+      "targetPort": "input_dict",
+      "source": 4,
+      "sourcePort": null
+    },
+    {
+      "target": 7,
+      "targetPort": "input_dict",
+      "source": 6,
+      "sourcePort": null
+    },
+    {
+      "target": 9,
+      "targetPort": "input_dict",
+      "source": 8,
+      "sourcePort": null
+    },
+    {
+      "target": 11,
+      "targetPort": "input_dict",
+      "source": 10,
+      "sourcePort": null
+    },
+    {
+      "target": 13,
+      "targetPort": "input_dict",
+      "source": 12,
+      "sourcePort": null
+    },
+    {
+      "target": 16,
+      "targetPort": "volume_lst",
+      "source": 14,
+      "sourcePort": null
+    },
+    {
+      "target": 16,
+      "targetPort": "energy_lst",
+      "source": 15,
+      "sourcePort": null
+    },
+    {
+      "target": 0,
+      "targetPort": "element",
+      "source": 17,
+      "sourcePort": null
+    },
+    {
+      "target": 0,
+      "targetPort": "a",
+      "source": 18,
+      "sourcePort": null
+    },
+    {
+      "target": 0,
+      "targetPort": "cubic",
+      "source": 19,
+      "sourcePort": null
+    },
+    {
+      "target": 1,
+      "targetPort": "pseudopotentials",
+      "source": 20,
+      "sourcePort": null
+    },
+    {
+      "target": 1,
+      "targetPort": "kpts",
+      "source": 21,
+      "sourcePort": null
+    },
+    {
+      "target": 1,
+      "targetPort": "calculation",
+      "source": 22,
+      "sourcePort": null
+    },
+    {
+      "target": 1,
+      "targetPort": "smearing",
+      "source": 23,
+      "sourcePort": null
+    },
+    {
+      "target": 2,
+      "targetPort": "working_directory",
+      "source": 24,
+      "sourcePort": null
+    },
+    {
+      "target": 3,
+      "targetPort": "strain_lst",
+      "source": 25,
+      "sourcePort": null
+    },
+    {
+      "target": 4,
+      "targetPort": "pseudopotentials",
+      "source": 20,
+      "sourcePort": null
+    },
+    {
+      "target": 4,
+      "targetPort": "kpts",
+      "source": 21,
+      "sourcePort": null
+    },
+    {
+      "target": 4,
+      "targetPort": "calculation",
+      "source": 26,
+      "sourcePort": null
+    },
+    {
+      "target": 4,
+      "targetPort": "smearing",
+      "source": 23,
+      "sourcePort": null
+    },
+    {
+      "target": 5,
+      "targetPort": "working_directory",
+      "source": 27,
+      "sourcePort": null
+    },
+    {
+      "target": 6,
+      "targetPort": "pseudopotentials",
+      "source": 20,
+      "sourcePort": null
+    },
+    {
+      "target": 6,
+      "targetPort": "kpts",
+      "source": 21,
+      "sourcePort": null
+    },
+    {
+      "target": 6,
+      "targetPort": "calculation",
+      "source": 26,
+      "sourcePort": null
+    },
+    {
+      "target": 6,
+      "targetPort": "smearing",
+      "source": 23,
+      "sourcePort": null
+    },
+    {
+      "target": 7,
+      "targetPort": "working_directory",
+      "source": 28,
+      "sourcePort": null
+    },
+    {
+      "target": 8,
+      "targetPort": "pseudopotentials",
+      "source": 20,
+      "sourcePort": null
+    },
+    {
+      "target": 8,
+      "targetPort": "kpts",
+      "source": 21,
+      "sourcePort": null
+    },
+    {
+      "target": 8,
+      "targetPort": "calculation",
+      "source": 26,
+      "sourcePort": null
+    },
+    {
+      "target": 8,
+      "targetPort": "smearing",
+      "source": 23,
+      "sourcePort": null
+    },
+    {
+      "target": 9,
+      "targetPort": "working_directory",
+      "source": 29,
+      "sourcePort": null
+    },
+    {
+      "target": 10,
+      "targetPort": "pseudopotentials",
+      "source": 20,
+      "sourcePort": null
+    },
+    {
+      "target": 10,
+      "targetPort": "kpts",
+      "source": 21,
+      "sourcePort": null
+    },
+    {
+      "target": 10,
+      "targetPort": "calculation",
+      "source": 26,
+      "sourcePort": null
+    },
+    {
+      "target": 10,
+      "targetPort": "smearing",
+      "source": 23,
+      "sourcePort": null
+    },
+    {
+      "target": 11,
+      "targetPort": "working_directory",
+      "source": 30,
+      "sourcePort": null
+    },
+    {
+      "target": 12,
+      "targetPort": "pseudopotentials",
+      "source": 20,
+      "sourcePort": null
+    },
+    {
+      "target": 12,
+      "targetPort": "kpts",
+      "source": 21,
+      "sourcePort": null
+    },
+    {
+      "target": 12,
+      "targetPort": "calculation",
+      "source": 26,
+      "sourcePort": null
+    },
+    {
+      "target": 12,
+      "targetPort": "smearing",
+      "source": 23,
+      "sourcePort": null
+    },
+    {
+      "target": 13,
+      "targetPort": "working_directory",
+      "source": 31,
+      "sourcePort": null
+    },
+    {
+      "target": 32,
+      "targetPort": null,
+      "source": 16,
+      "sourcePort": null
+    }
+  ]
+}
