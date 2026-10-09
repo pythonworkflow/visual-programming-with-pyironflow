@@ -1,0 +1,6 @@
+format: jb-book
+root: README
+chapters:
+- file: arithmetic/pyironflow.ipynb
+- file: nfdi/pyironflow.ipynb
+- file: quantum_espresso/pyironflow.ipynb

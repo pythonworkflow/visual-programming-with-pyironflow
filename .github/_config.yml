@@ -1,0 +1,14 @@
+title: Visual Programming
+author: Jan Janssen
+copyright: "2026"
+
+execute:
+  execute_notebooks           : off
+
+repository:
+    url                       : https://github.com/pythonworkflow/visual-programming-with-pyironflow
+    path_to_book              : ""
+
+launch_buttons:
+  notebook_interface          : jupyterlab
+  binderhub_url               : https://mybinder.org
