@@ -2,6 +2,7 @@ channels:
 - conda-forge
 dependencies:
 - python =3.12
+- hatchling =1.32.4
 - pyiron_workflow =0.17.0
 - pyironflow =0.0.24
 - python-workflow-definition =0.1.5
