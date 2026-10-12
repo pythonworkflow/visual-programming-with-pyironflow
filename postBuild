@@ -1,0 +1,5 @@
+conda env create -n preprocessing -f nfdi/source/envs/preprocessing.yaml -y
+conda env create -n processing -f nfdi/source/envs/processing.yaml -y
+conda env create -n postprocessing -f nfdi/source/envs/postprocessing.yaml -y
+pip install -e quantum_espresso/qe_xml_parser
+mv quantum_espresso/espresso ~
