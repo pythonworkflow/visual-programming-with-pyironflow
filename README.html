@@ -334,7 +334,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="visual-programming-with-pyironflow">
 <h1>Visual Programming with pyironflow<a class="headerlink" href="#visual-programming-with-pyironflow" title="Link to this heading">#</a></h1>
-<p><a class="reference external" href="https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/deploy.yml"><img alt="Deploy" src="https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/deploy.yml/badge.svg" /></a>
+<p><a class="reference external" href="https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/pipeline.yml"><img alt="Pipeline" src="https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/pipeline.yml/badge.svg" /></a>
 <a class="reference external" href="https://mybinder.org/v2/gh/pythonworkflow/visual-programming-with-pyironflow/HEAD"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
 <p>Explore, execute and debug workflows stored in the <a class="reference external" href="https://pythonworkflow.github.io/python-workflow-definition/">Python Workflow Definition</a> (PWD) with the visual programming environment <a class="reference external" href="https://github.com/pyiron/pyironflow">pyironflow</a>.</p>
 <p><img alt="screenshot" src="_images/screenshot.png" /></p>
@@ -396,7 +396,9 @@
 <h2>Repository Structure<a class="headerlink" href="#repository-structure" title="Link to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.
 ├── README.md                  # this overview, also the landing page of the website
-├── environment.yml            # conda environment for all examples (used by Binder)
+├── apt.txt                    # apt dependencies - libGL (used by Binder and Continuous Integration)
+├── environment.yml            # conda environment for all examples (used by Binder and Continuous Integration)
+├── postBuild                  # post build script (used by Binder)
 ├── arithmetic/
 │   ├── pyironflow.ipynb       # notebook: reload and define the workflow with pyironflow
 │   ├── workflow.py            # Python functions

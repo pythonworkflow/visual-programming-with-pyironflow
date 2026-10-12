@@ -1,5 +1,5 @@
 # Visual Programming with pyironflow
-[![Deploy](https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/deploy.yml/badge.svg)](https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/deploy.yml)
+[![Pipeline](https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/pipeline.yml/badge.svg)](https://github.com/pythonworkflow/visual-programming-with-pyironflow/actions/workflows/pipeline.yml)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pythonworkflow/visual-programming-with-pyironflow/HEAD)
 
 Explore, execute and debug workflows stored in the [Python Workflow Definition](https://pythonworkflow.github.io/python-workflow-definition/) (PWD) with the visual programming environment [pyironflow](https://github.com/pyiron/pyironflow).
@@ -47,7 +47,9 @@ The repository contains the same three example workflows that the [Python Workfl
 ```
 .
 ├── README.md                  # this overview, also the landing page of the website
-├── environment.yml            # conda environment for all examples (used by Binder)
+├── apt.txt                    # apt dependencies - libGL (used by Binder and Continuous Integration)
+├── environment.yml            # conda environment for all examples (used by Binder and Continuous Integration)
+├── postBuild                  # post build script (used by Binder)
 ├── arithmetic/
 │   ├── pyironflow.ipynb       # notebook: reload and define the workflow with pyironflow
 │   ├── workflow.py            # Python functions
