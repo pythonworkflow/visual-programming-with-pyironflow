@@ -1,0 +1,83 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  nfdi4ing:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v6
+    - name: Conda config
+      run: echo -e "channels:\n  - conda-forge\n" > .condarc
+    - uses: conda-incubator/setup-miniconda@v4
+      with:
+        python-version: "3.12"
+        miniforge-version: latest
+        condarc-file: .condarc
+        environment-file: environment.yml
+    - name: Installation and setup
+      shell: bash -l {0}
+      run: |
+        conda install -c conda-forge jupyter papermill
+    - name: Create Additional Conda Environments
+      shell: bash -l {0}
+      run: |
+        conda env create -n preprocessing -f nfdi/source/envs/preprocessing.yaml -y
+        conda env create -n processing -f nfdi/source/envs/processing.yaml -y
+        conda env create -n postprocessing -f nfdi/source/envs/postprocessing.yaml -y
+    - name: Tests
+      shell: bash -l {0}
+      run: |
+        cd nfdi/
+        papermill pyironflow.ipynb pyironflow_out.ipynb -k "python3"
+
+  quantumespresso:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup environment
+      shell: bash -l {0}
+      run: echo -e "channels:\n  - conda-forge\n" > .condarc
+    - uses: conda-incubator/setup-miniconda@v4
+      with:
+        python-version: "3.12"
+        miniforge-version: latest
+        condarc-file: .condarc
+        environment-file: environment.yml
+    - name: Installation and setup
+      shell: bash -l {0}
+      run: |
+        pip install --no-deps --no-build-isolation -e quantum_espresso/qe_xml_parser
+        conda install -c conda-forge jupyter papermill
+    - name: Tests
+      shell: bash -l {0}
+      run: |
+        export ESPRESSO_PSEUDO=$(pwd)/espresso/pseudo
+        cp -r quantum_espresso/espresso .
+        cd quantum_espresso
+        papermill pyironflow.ipynb pyironflow_out.ipynb -k "python3"
+
+  arithmetic:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Conda config
+      run: echo -e "channels:\n  - conda-forge\n" > .condarc
+    - uses: conda-incubator/setup-miniconda@v4
+      with:
+        python-version: "3.12"
+        miniforge-version: latest
+        condarc-file: .condarc
+        environment-file: environment.yml
+    - name: Installation and setup
+      shell: bash -l {0}
+      run: |
+        conda install -c conda-forge jupyter papermill
+    - name: Tests
+      shell: bash -l {0}
+      run: |
+        cd arithmetic
+        papermill pyironflow.ipynb pyironflow_out.ipynb -k "python3"
