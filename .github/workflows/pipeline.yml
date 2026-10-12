@@ -50,8 +50,8 @@ jobs:
     - name: Installation and setup
       shell: bash -l {0}
       run: |
+        conda install -c conda-forge jupyter papermill hatchling
         pip install --no-deps --no-build-isolation -e quantum_espresso/qe_xml_parser
-        conda install -c conda-forge jupyter papermill
     - name: Tests
       shell: bash -l {0}
       run: |
