@@ -357,8 +357,48 @@
   <section class="tex2jax_ignore mathjax_ignore" id="quantum-espresso-workflow">
 <h1>Quantum Espresso Workflow<a class="headerlink" href="#quantum-espresso-workflow" title="Link to this heading">#</a></h1>
 <p>This notebook builds the Quantum Espresso energy-volume-curve workflow with <a class="reference external" href="https://github.com/pyiron/pyironflow"><code class="docutils literal notranslate"><span class="pre">pyironflow</span></code></a>.</p>
+<p>An energy-volume curve is a standard calculation in computational materials science. The total energy of a crystal is computed for a series of volumes around the equilibrium volume. The minimum of the curve gives the equilibrium volume, and its curvature is related to the bulk modulus. Here, the curve is calculated for face-centered cubic aluminium with the density functional theory code <a class="reference external" href="https://www.quantum-espresso.org">Quantum ESPRESSO</a>.</p>
+<p>The workflow uses the following Python functions, defined in <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_bulk_structure</span></code></p></td>
+<td><p>Build the cubic fcc aluminium unit cell (lattice constant <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">4.04</span></code> Å) with <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/">ASE</a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">calculate_qe</span></code></p></td>
+<td><p>Write the input file for <code class="docutils literal notranslate"><span class="pre">pw.x</span></code> with ASE, run Quantum ESPRESSO, and parse the XML output. Returns the final <code class="docutils literal notranslate"><span class="pre">structure</span></code>, the <code class="docutils literal notranslate"><span class="pre">energy</span></code> and the <code class="docutils literal notranslate"><span class="pre">volume</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generate_structures</span></code></p></td>
+<td><p>Apply a list of volumetric strains to a structure. The cell is scaled by <code class="docutils literal notranslate"><span class="pre">strain</span> <span class="pre">**</span> <span class="pre">(1/3)</span></code>, so the volume changes by the factor <code class="docutils literal notranslate"><span class="pre">strain</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_energy_volume_curve</span></code></p></td>
+<td><p>Plot the energy as a function of the volume and save the figure as <code class="docutils literal notranslate"><span class="pre">evcurve.png</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The workflow runs these steps in order:</p>
+<ol class="arabic simple">
+<li><p>Create the initial aluminium structure.</p></li>
+<li><p>Relax the cell with a variable-cell relaxation (<code class="docutils literal notranslate"><span class="pre">vc-relax</span></code>) in Quantum ESPRESSO.</p></li>
+<li><p>Generate five strained structures from the relaxed structure, with volumes between 90 % and 110 % of the relaxed volume.</p></li>
+<li><p>Compute the total energy of each strained structure with a self-consistent field (<code class="docutils literal notranslate"><span class="pre">scf</span></code>) calculation. These five calculations are independent of each other, so a workflow engine can run them in parallel.</p></li>
+<li><p>Collect the volumes and energies and plot the energy-volume curve.</p></li>
+</ol>
+<p>Atomic structures are passed between the functions as JSON strings, using the <a class="reference external" href="https://www.optimade.org">OPTIMADE</a> structure format, rather than as Python objects. This keeps the data exchanged between nodes serializable and independent of any particular workflow engine. The pseudopotential <code class="docutils literal notranslate"><span class="pre">Al.pbe-n-kjpaw_psl.1.0.0.UPF</span></code> used by Quantum ESPRESSO is provided in the <code class="docutils literal notranslate"><span class="pre">espresso/pseudo</span></code> directory.</p>
+<p>The same workflow is implemented with other workflow engines in the <a class="reference external" href="https://github.com/pythonworkflow/python-workflow-definition/tree/main/example_workflows/quantum_espresso">Python Workflow Definition repository</a>. This notebook first reloads the existing <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> in <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> and runs it. It then shows how the workflow is defined with <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> and exported to <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>.</p>
 <section id="reload-workflow-in-pyironflow">
 <h2>Reload workflow in pyironflow<a class="headerlink" href="#reload-workflow-in-pyironflow" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">load_workflow_json()</span></code> reads <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> and builds a <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> <code class="docutils literal notranslate"><span class="pre">Workflow</span></code>. Besides the functions from <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code>, the JSON file refers to two helper functions that the Python Workflow Definition provides for all workflow engines:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">python_workflow_definition.shared.get_dict</span></code> bundles several inputs into one dictionary. Here it builds the <code class="docutils literal notranslate"><span class="pre">input_dict</span></code> for each <code class="docutils literal notranslate"><span class="pre">calculate_qe</span></code> call from the structure, pseudopotentials, k-points, calculation type and smearing.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python_workflow_definition.shared.get_list</span></code> collects several inputs into one list. Here it gathers the five volumes and the five energies for the final plot.</p></li>
+</ul>
+<p>These helpers appear as regular nodes in the <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> graph.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">workflow_json_filename</span> <span class="o">=</span> <span class="s2">"workflow.json"</span>
@@ -390,7 +430,38 @@
 <div class="cell_output docutils container">
 <script type="application/vnd.jupyter.widget-view+json">{"model_id": "a1c511cb257f49bc8fc35d521e207d6c", "version_major": 2, "version_minor": 0}</script></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> interface is an interactive Jupyter widget, so it only appears in a live Jupyter session. The screenshot below shows the Quantum ESPRESSO workflow in <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> after it has been executed:</p>
 <p><img alt="screenshot" src="../_images/screenshot2.png" /></p>
+<p>The user interface of <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> is split into two parts:</p>
+<ul class="simple">
+<li><p><strong>Sidebar (left):</strong></p>
+<ul>
+<li><p><strong>Node Library</strong> lists Python functions that can be added to the workflow as new nodes.</p></li>
+<li><p><strong>Output</strong> shows the result of the most recent execution, including anything the Python functions print to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p></li>
+<li><p><strong>Logging Info</strong> collects log messages of the workflow engine.</p></li>
+</ul>
+</li>
+<li><p><strong>Canvas (right):</strong> each workflow is shown in its own tab. The buttons in the top left are <strong>Run</strong> (execute the whole workflow), <strong>Save</strong> and <strong>Load</strong> (write the workflow, including its results, to storage and read it back) and <strong>Delete</strong> (remove the saved copy from storage). The controls in the bottom left zoom and fit the view. The <strong>Reset Layout</strong> button arranges the nodes automatically, and the minimap below it helps you find your way around larger graphs.</p></li>
+</ul>
+<p>Each green box is a node, which is one Python function. Its input ports are on the left and its output ports on the right. Input values that do not come from another node can be edited in the fields next to the input ports. The lines between nodes are the edges of the workflow and show how data flows from one function to the next.</p>
+<p>Besides running the whole workflow, you can work with individual nodes:</p>
+<ul class="simple">
+<li><p><strong>Pull</strong> runs a node together with all upstream nodes it depends on.</p></li>
+<li><p><strong>Push</strong> runs a node and all downstream nodes that depend on it.</p></li>
+<li><p><strong>Reset</strong> clears the cached results of a node.</p></li>
+<li><p>The right-click menu offers <strong>View Output</strong>, which shows a node’s outputs without running it, and <strong>View Source</strong>, which shows the Python source code behind the node.</p></li>
+</ul>
+<p>These options make it easy to inspect intermediate results while debugging a workflow.</p>
+<p>The screenshot shows the right-hand part of the graph, where the five strained calculations fan out and are collected again. From left to right:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_dict_1</span></code> to <code class="docutils literal notranslate"><span class="pre">get_dict_5</span></code> build the input dictionaries for the five strained structures.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calculate_qe_1</span></code> to <code class="docutils literal notranslate"><span class="pre">calculate_qe_5</span></code> run the <code class="docutils literal notranslate"><span class="pre">scf</span></code> calculations.</p></li>
+<li><p>Pairs of <code class="docutils literal notranslate"><span class="pre">injected_GetItem</span></code> nodes extract the <code class="docutils literal notranslate"><span class="pre">energy</span></code> and the <code class="docutils literal notranslate"><span class="pre">volume</span></code> from each result dictionary.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_list_0</span></code> and <code class="docutils literal notranslate"><span class="pre">get_list_1</span></code> collect the volumes and the energies into two lists.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plot_energy_volume_curve</span></code> produces the final plot.</p></li>
+</ul>
+<p>The initial structure, the <code class="docutils literal notranslate"><span class="pre">vc-relax</span></code> calculation and <code class="docutils literal notranslate"><span class="pre">generate_structures</span></code> are further to the left, as shown in the minimap. A graph like this shows the parallel structure of the workflow at a glance, which is much harder to see in the JSON file.</p>
+<p>The <strong>Output</strong> panel shows the result of pulling the <code class="docutils literal notranslate"><span class="pre">plot_energy_volume_curve</span></code> node. The resulting energy-volume curve has its minimum close to the volume of the relaxed structure. The red notes about <code class="docutils literal notranslate"><span class="pre">IEEE_INVALID_FLAG</span></code> are printed by the Fortran runtime when <code class="docutils literal notranslate"><span class="pre">pw.x</span></code> exits, once for each of the six Quantum ESPRESSO calculations. They are informational and do not mean the calculations failed.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -412,9 +483,11 @@ Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG
 <img alt="../_images/b1f3a4f231185034eafd3322e33ca0b3de6fef807fc6ecd0a1bf9265a9453bf7.png" src="../_images/b1f3a4f231185034eafd3322e33ca0b3de6fef807fc6ecd0a1bf9265a9453bf7.png" />
 </div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">wf.run()</span></code> runs the same workflow from Python. It performs one <code class="docutils literal notranslate"><span class="pre">vc-relax</span></code> and five <code class="docutils literal notranslate"><span class="pre">scf</span></code> calculations with Quantum ESPRESSO, in the working directories <code class="docutils literal notranslate"><span class="pre">mini</span></code> and <code class="docutils literal notranslate"><span class="pre">strain_0</span></code> to <code class="docutils literal notranslate"><span class="pre">strain_4</span></code>, and returns the matplotlib figure of the energy-volume curve. The figure is also saved as <code class="docutils literal notranslate"><span class="pre">evcurve.png</span></code>.</p>
 </section>
 <section id="define-workflow-with-pyiron-workflow">
 <h2>Define workflow with pyiron_workflow<a class="headerlink" href="#define-workflow-with-pyiron-workflow" title="Link to this heading">#</a></h2>
+<p>This part shows how <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> was created. <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> is a graphical front end for <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code>, so the workflow is defined with the <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> Python interface.</p>
 <p>Plain functions are converted to graph nodes with <code class="docutils literal notranslate"><span class="pre">to_function_node</span></code>, assembled into a <code class="docutils literal notranslate"><span class="pre">Workflow</span></code> via attribute access, and exported as a PWD <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -467,6 +540,7 @@ Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG
 </div>
 </div>
 </div>
+<p>The pseudopotentials are defined once as a workflow-level value. All six Quantum ESPRESSO calculations use the same value, so it appears as a single input node in the exported <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">pseudopotentials</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Al"</span><span class="p">:</span> <span class="s2">"Al.pbe-n-kjpaw_psl.1.0.0.UPF"</span><span class="p">}</span>
@@ -507,6 +581,7 @@ Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG
 </div>
 </div>
 </div>
+<p>The first <code class="docutils literal notranslate"><span class="pre">calculate_qe</span></code> node runs the variable-cell relaxation in the working directory <code class="docutils literal notranslate"><span class="pre">mini</span></code>. Its output dictionary contains the relaxed <code class="docutils literal notranslate"><span class="pre">structure</span></code>, which is the starting point for the strained structures.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">calc_mini</span> <span class="o">=</span> <span class="n">calculate_qe</span><span class="p">(</span>
@@ -574,6 +649,7 @@ Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG
 </div>
 </div>
 </div>
+<p>Finally, the two lists are passed to <code class="docutils literal notranslate"><span class="pre">plot_energy_volume_curve</span></code>, which produces the last node of the workflow.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">plot_energy_volume_curve</span><span class="p">(</span><span class="n">volume_lst</span><span class="o">=</span><span class="n">wf</span><span class="o">.</span><span class="n">volume_lst</span><span class="p">,</span> <span class="n">energy_lst</span><span class="o">=</span><span class="n">wf</span><span class="o">.</span><span class="n">energy_lst</span><span class="p">)</span>
@@ -1169,6 +1245,13 @@ Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG
 </div>
 </div>
 </div>
+<p>The exported <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> contains 17 <code class="docutils literal notranslate"><span class="pre">function</span></code> nodes, 15 <code class="docutils literal notranslate"><span class="pre">input</span></code> nodes and one <code class="docutils literal notranslate"><span class="pre">output</span></code> node:</p>
+<ul class="simple">
+<li><p><strong>Function nodes:</strong> <code class="docutils literal notranslate"><span class="pre">get_bulk_structure</span></code>, six <code class="docutils literal notranslate"><span class="pre">get_dict</span></code> and six <code class="docutils literal notranslate"><span class="pre">calculate_qe</span></code> nodes (one each for the relaxation and the five strained structures), <code class="docutils literal notranslate"><span class="pre">generate_structures</span></code>, two <code class="docutils literal notranslate"><span class="pre">get_list</span></code> nodes and <code class="docutils literal notranslate"><span class="pre">plot_energy_volume_curve</span></code>.</p></li>
+<li><p><strong>Input nodes:</strong> each distinct input value appears once. <code class="docutils literal notranslate"><span class="pre">pseudopotentials</span></code>, <code class="docutils literal notranslate"><span class="pre">kpts</span></code> and <code class="docutils literal notranslate"><span class="pre">smearing</span></code> are shared by all six <code class="docutils literal notranslate"><span class="pre">get_dict</span></code> nodes. The two calculation types are stored as <code class="docutils literal notranslate"><span class="pre">calculation_0</span></code> (<code class="docutils literal notranslate"><span class="pre">vc-relax</span></code>) and <code class="docutils literal notranslate"><span class="pre">calculation_1</span></code> (<code class="docutils literal notranslate"><span class="pre">scf</span></code>). The six working directories are stored as <code class="docutils literal notranslate"><span class="pre">working_directory_0</span></code> to <code class="docutils literal notranslate"><span class="pre">working_directory_5</span></code>.</p></li>
+<li><p><strong>Engine-specific helpers:</strong> the <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> nodes <code class="docutils literal notranslate"><span class="pre">inputs_to_dict</span></code> and <code class="docutils literal notranslate"><span class="pre">get_values_from_dict</span></code> used above are not part of the file. They are replaced by the engine-independent helpers <code class="docutils literal notranslate"><span class="pre">python_workflow_definition.shared.get_dict</span></code> and <code class="docutils literal notranslate"><span class="pre">get_list</span></code>. This is why the reloaded workflow in the first part of this notebook contains <code class="docutils literal notranslate"><span class="pre">get_dict</span></code> and <code class="docutils literal notranslate"><span class="pre">get_list</span></code> nodes.</p></li>
+</ul>
+<p>With this translation, the same <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> can be executed with any workflow engine supported by the <a class="reference external" href="https://pythonworkflow.github.io/python-workflow-definition/">Python Workflow Definition</a>, or explored visually with <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code>.</p>
 </section>
 </section>
 

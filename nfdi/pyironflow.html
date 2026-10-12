@@ -60,6 +60,8 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'nfdi/pyironflow';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -358,8 +360,65 @@
   <section class="tex2jax_ignore mathjax_ignore" id="nfdi4ing">
 <h1>NFDI4Ing<a class="headerlink" href="#nfdi4ing" title="Link to this heading">#</a></h1>
 <p><a class="github reference external" href="https://github.com/BAMresearch/NFDI4IngScientificWorkflowRequirements">BAMresearch/NFDI4IngScientificWorkflowRequirements</a></p>
+<p>The <a class="reference external" href="https://github.com/BAMresearch/NFDI4IngScientificWorkflowRequirements">NFDI4Ing scientific workflow requirements</a> define a benchmark for workflow management systems. It is a typical file-based simulation workflow in computational engineering: it starts from a geometry, solves a partial differential equation with the finite element method, post-processes the solution and finally compiles a short paper that contains the results. Each step calls an external command line tool, and the steps exchange data through files.</p>
+<p>The workflow consists of six Python functions, defined in <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Step</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Tool</p></th>
+<th class="head"><p>Main input</p></th>
+<th class="head"><p>Main output</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">generate_mesh</span></code></p></td>
+<td><p><a class="reference external" href="https://gmsh.info">gmsh</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">domain_size</span></code>, <code class="docutils literal notranslate"><span class="pre">unit_square.geo</span></code></p></td>
+<td><p>mesh <code class="docutils literal notranslate"><span class="pre">square.msh</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">convert_to_xdmf</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/nschloe/meshio">meshio</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">square.msh</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">square.xdmf</span></code> and <code class="docutils literal notranslate"><span class="pre">square.h5</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">poisson</span></code></p></td>
+<td><p><a class="reference external" href="https://fenicsproject.org">FEniCS</a> (<code class="docutils literal notranslate"><span class="pre">poisson.py</span></code>)</p></td>
+<td><p>mesh in XDMF format</p></td>
+<td><p>solution <code class="docutils literal notranslate"><span class="pre">poisson.pvd</span></code> and <code class="docutils literal notranslate"><span class="pre">poisson000000.vtu</span></code>, number of degrees of freedom</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">plot_over_line</span></code></p></td>
+<td><p><a class="reference external" href="https://www.paraview.org">ParaView</a> <code class="docutils literal notranslate"><span class="pre">pvbatch</span></code> (<code class="docutils literal notranslate"><span class="pre">postprocessing.py</span></code>)</p></td>
+<td><p>solution files</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">plotoverline.csv</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">substitute_macros</span></code></p></td>
+<td><p>Python (<code class="docutils literal notranslate"><span class="pre">prepare_paper_macros.py</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">plotoverline.csv</span></code>, number of degrees of freedom, <code class="docutils literal notranslate"><span class="pre">domain_size</span></code></p></td>
+<td><p>LaTeX macros <code class="docutils literal notranslate"><span class="pre">macros.tex</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compile_paper</span></code></p></td>
+<td><p><a class="reference external" href="https://tectonic-typesetting.github.io">tectonic</a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">paper.tex</span></code>, <code class="docutils literal notranslate"><span class="pre">macros.tex</span></code>, <code class="docutils literal notranslate"><span class="pre">plotoverline.csv</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">paper.pdf</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The physics is the Poisson equation on a square domain with edge length <code class="docutils literal notranslate"><span class="pre">domain_size</span></code>, with Dirichlet boundary conditions <span class="math notranslate nohighlight">\(u = 1 + x^2 + 2y^2\)</span>. The solution is evaluated along the diagonal of the square, and the resulting curve is included as a plot in the final <code class="docutils literal notranslate"><span class="pre">paper.pdf</span></code>.</p>
+<p>The input templates and scripts for the individual steps are stored in the <code class="docutils literal notranslate"><span class="pre">source</span></code> directory. The tools have conflicting dependencies, so each stage runs in its own conda environment: <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code>, <code class="docutils literal notranslate"><span class="pre">processing</span></code> and <code class="docutils literal notranslate"><span class="pre">postprocessing</span></code>, defined in <code class="docutils literal notranslate"><span class="pre">source/envs/</span></code>. The Python functions call the tools with <code class="docutils literal notranslate"><span class="pre">check_output()</span></code> from <a class="reference external" href="https://github.com/pyiron/conda_subprocess"><code class="docutils literal notranslate"><span class="pre">conda_subprocess</span></code></a>. It works like <code class="docutils literal notranslate"><span class="pre">subprocess.check_output()</span></code> but runs the command inside the conda environment named by <code class="docutils literal notranslate"><span class="pre">prefix_name</span></code>. Each function copies its input files into a working directory named after its stage and returns the absolute paths of the files it creates. These paths are the data passed along the edges of the workflow.</p>
+<p>This example shows that the Python Workflow Definition is not limited to Python-native data. File-based workflows that chain external simulation codes are described the same way. The same workflow is implemented with other workflow engines in the <a class="reference external" href="https://github.com/pythonworkflow/python-workflow-definition/tree/main/example_workflows/nfdi">Python Workflow Definition repository</a>.</p>
+<p>The notebook first reloads the existing <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> in <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> and runs it. It then shows how the workflow is defined with <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> and exported to <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>.</p>
 <section id="reload-workflow-in-pyironflow">
 <h2>Reload workflow in pyironflow<a class="headerlink" href="#reload-workflow-in-pyironflow" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">load_workflow_json()</span></code> reads <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>, imports the six functions from <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code> and connects them into a <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> <code class="docutils literal notranslate"><span class="pre">Workflow</span></code>. The workflow is then shown in the <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> graphical user interface.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">source_directory</span></code> input in <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> is an absolute path on the computer where the file was exported. To run the workflow on another computer, regenerate <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> with the second part of this notebook, which sets <code class="docutils literal notranslate"><span class="pre">source_directory</span></code> to the local <code class="docutils literal notranslate"><span class="pre">source</span></code> directory.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">workflow_json_filename</span> <span class="o">=</span> <span class="s2">"workflow.json"</span>
@@ -391,7 +450,30 @@
 <div class="cell_output docutils container">
 <script type="application/vnd.jupyter.widget-view+json">{"model_id": "10b51bf616bd4b6b9c8b0cbf249aa318", "version_major": 2, "version_minor": 0}</script></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> interface is an interactive Jupyter widget, so it only appears in a live Jupyter session. The screenshot below shows the NFDI4Ing workflow in <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> after it has been executed:</p>
 <p><img alt="screenshot" src="../_images/screenshot1.png" /></p>
+<p>The user interface of <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> is split into two parts:</p>
+<ul class="simple">
+<li><p><strong>Sidebar (left):</strong></p>
+<ul>
+<li><p><strong>Node Library</strong> lists Python functions that can be added to the workflow as new nodes.</p></li>
+<li><p><strong>Output</strong> shows the result of the most recent execution, including anything the Python functions print to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p></li>
+<li><p><strong>Logging Info</strong> collects log messages of the workflow engine.</p></li>
+</ul>
+</li>
+<li><p><strong>Canvas (right):</strong> each workflow is shown in its own tab. The buttons in the top left are <strong>Run</strong> (execute the whole workflow), <strong>Save</strong> and <strong>Load</strong> (write the workflow, including its results, to storage and read it back) and <strong>Delete</strong> (remove the saved copy from storage). The controls in the bottom left zoom and fit the view. The <strong>Reset Layout</strong> button arranges the nodes automatically, and the minimap below it helps you find your way around larger graphs.</p></li>
+</ul>
+<p>Each green box is a node, which is one Python function. Its input ports are on the left and its output ports on the right. Input values that do not come from another node can be edited in the fields next to the input ports. The lines between nodes are the edges of the workflow and show how data flows from one function to the next.</p>
+<p>Besides running the whole workflow, you can work with individual nodes:</p>
+<ul class="simple">
+<li><p><strong>Pull</strong> runs a node together with all upstream nodes it depends on.</p></li>
+<li><p><strong>Push</strong> runs a node and all downstream nodes that depend on it.</p></li>
+<li><p><strong>Reset</strong> clears the cached results of a node.</p></li>
+<li><p>The right-click menu offers <strong>View Output</strong>, which shows a node’s outputs without running it, and <strong>View Source</strong>, which shows the Python source code behind the node.</p></li>
+</ul>
+<p>These options make it easy to inspect intermediate results while debugging a workflow.</p>
+<p>The screenshot shows the second half of the NFDI4Ing workflow. The <code class="docutils literal notranslate"><span class="pre">poisson</span></code> node returns a dictionary, and <code class="docutils literal notranslate"><span class="pre">injected_GetItem</span></code> nodes extract the individual entries (<code class="docutils literal notranslate"><span class="pre">numdofs</span></code>, <code class="docutils literal notranslate"><span class="pre">pvd_file</span></code> and <code class="docutils literal notranslate"><span class="pre">vtu_file</span></code>). These entries flow into <code class="docutils literal notranslate"><span class="pre">plot_over_line</span></code> and <code class="docutils literal notranslate"><span class="pre">substitute_macros</span></code>, which then feed <code class="docutils literal notranslate"><span class="pre">compile_paper</span></code>. Further to the left, outside the visible area but shown in the minimap, are <code class="docutils literal notranslate"><span class="pre">generate_mesh</span></code> and <code class="docutils literal notranslate"><span class="pre">convert_to_xdmf</span></code>. The input fields on the left side of each node show the values of <code class="docutils literal notranslate"><span class="pre">domain_size</span></code> and <code class="docutils literal notranslate"><span class="pre">source_directory</span></code>. These inputs are shared by several nodes.</p>
+<p>The <strong>Output</strong> panel shows the result of pulling the final <code class="docutils literal notranslate"><span class="pre">compile_paper</span></code> node: the path to the generated <code class="docutils literal notranslate"><span class="pre">paper.pdf</span></code>. The red box above it is a deprecation warning that the FEniCS installation in the <code class="docutils literal notranslate"><span class="pre">processing</span></code> environment prints to <code class="docutils literal notranslate"><span class="pre">stderr</span></code>. Showing these messages directly in the interface helps when debugging workflows that call external codes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -408,9 +490,17 @@
 </div>
 </div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">wf.run()</span></code> runs the same workflow from Python. It goes through all six steps and returns the absolute path to the compiled <code class="docutils literal notranslate"><span class="pre">paper.pdf</span></code> in the <code class="docutils literal notranslate"><span class="pre">postprocessing</span></code> directory. The intermediate files are kept in the <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code>, <code class="docutils literal notranslate"><span class="pre">processing</span></code> and <code class="docutils literal notranslate"><span class="pre">postprocessing</span></code> working directories next to this notebook.</p>
 </section>
 <section id="define-workflow-with-pyironflow">
 <h2>Define workflow with pyironflow<a class="headerlink" href="#define-workflow-with-pyironflow" title="Link to this heading">#</a></h2>
+<p>This part shows how <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> was created. <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> is a graphical front end for <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code>, so the workflow is defined with the <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> Python interface. The steps are:</p>
+<ol class="arabic simple">
+<li><p>Wrap each Python function from <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code> into a node class with <code class="docutils literal notranslate"><span class="pre">to_function_node()</span></code>. The function is imported under a name with a leading underscore, so that the node class can use the plain name.</p></li>
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">Workflow</span></code> and add the nodes by assigning them as attributes of the workflow, for example <code class="docutils literal notranslate"><span class="pre">wf.gmsh_output_file</span> <span class="pre">=</span> <span class="pre">generate_mesh(...)</span></code>.</p></li>
+<li><p>Connect the nodes by passing the output of one node as the input of the next.</p></li>
+<li><p>Export the workflow graph to the Python Workflow Definition with <code class="docutils literal notranslate"><span class="pre">write_workflow_json()</span></code>.</p></li>
+</ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -460,6 +550,11 @@
 </div>
 </div>
 </div>
+<p>The workflow has two inputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">domain_size</span></code>: the edge length of the square domain. It is used by gmsh to generate the mesh, and it is written into the paper.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_directory</span></code>: the absolute path of the <code class="docutils literal notranslate"><span class="pre">source</span></code> directory, which holds the templates and scripts for the individual steps. Every step except <code class="docutils literal notranslate"><span class="pre">convert_to_xdmf</span></code> copies its files from this directory.</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">domain_size</span> <span class="o">=</span> <span class="mf">2.0</span>
@@ -474,6 +569,7 @@
 </div>
 </div>
 </div>
+<p><strong>Step 1: mesh generation.</strong> <code class="docutils literal notranslate"><span class="pre">generate_mesh</span></code> copies <code class="docutils literal notranslate"><span class="pre">unit_square.geo</span></code> into the <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code> directory and runs <code class="docutils literal notranslate"><span class="pre">gmsh</span></code> in the <code class="docutils literal notranslate"><span class="pre">preprocessing</span></code> conda environment. It returns the path of the 2D mesh <code class="docutils literal notranslate"><span class="pre">square.msh</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">gmsh_output_file</span> <span class="o">=</span> <span class="n">generate_mesh</span><span class="p">(</span>
@@ -484,6 +580,7 @@
 </div>
 </div>
 </div>
+<p><strong>Step 2: mesh conversion.</strong> <code class="docutils literal notranslate"><span class="pre">convert_to_xdmf</span></code> converts the gmsh mesh with <code class="docutils literal notranslate"><span class="pre">meshio</span></code> into the XDMF format that FEniCS can read. It returns a dictionary with the paths of the <code class="docutils literal notranslate"><span class="pre">xdmf_file</span></code> and the accompanying <code class="docutils literal notranslate"><span class="pre">h5_file</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">meshio_output_dict</span> <span class="o">=</span> <span class="n">convert_to_xdmf</span><span class="p">(</span>
@@ -493,6 +590,7 @@
 </div>
 </div>
 </div>
+<p><strong>Step 3: finite element simulation.</strong> <code class="docutils literal notranslate"><span class="pre">poisson</span></code> solves the Poisson equation with FEniCS in the <code class="docutils literal notranslate"><span class="pre">processing</span></code> conda environment. The two entries of the dictionary returned by the previous step are selected with <code class="docutils literal notranslate"><span class="pre">wf.meshio_output_dict[&quot;xdmf_file&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">wf.meshio_output_dict[&quot;h5_file&quot;]</span></code>. The function returns a dictionary with the solution files (<code class="docutils literal notranslate"><span class="pre">pvd_file</span></code>, <code class="docutils literal notranslate"><span class="pre">vtu_file</span></code>) and the number of degrees of freedom (<code class="docutils literal notranslate"><span class="pre">numdofs</span></code>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">poisson_dict</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span>
@@ -504,6 +602,7 @@
 </div>
 </div>
 </div>
+<p><strong>Step 4: post-processing.</strong> <code class="docutils literal notranslate"><span class="pre">plot_over_line</span></code> uses ParaView’s <code class="docutils literal notranslate"><span class="pre">pvbatch</span></code> in the <code class="docutils literal notranslate"><span class="pre">postprocessing</span></code> conda environment to sample the solution along the diagonal of the domain. It stores the result in <code class="docutils literal notranslate"><span class="pre">plotoverline.csv</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">pvbatch_output_file</span> <span class="o">=</span> <span class="n">plot_over_line</span><span class="p">(</span>
@@ -515,6 +614,7 @@
 </div>
 </div>
 </div>
+<p><strong>Step 5: prepare the paper.</strong> <code class="docutils literal notranslate"><span class="pre">substitute_macros</span></code> fills the template <code class="docutils literal notranslate"><span class="pre">macros.tex.template</span></code> with the domain size, the number of degrees of freedom from the simulation, and the path to the CSV file. This node collects results from several earlier steps, so the workflow is a directed acyclic graph rather than a simple chain.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">macros_tex_file</span> <span class="o">=</span> <span class="n">substitute_macros</span><span class="p">(</span> 
@@ -527,6 +627,7 @@
 </div>
 </div>
 </div>
+<p><strong>Step 6: compile the paper.</strong> <code class="docutils literal notranslate"><span class="pre">compile_paper</span></code> compiles <code class="docutils literal notranslate"><span class="pre">paper.tex</span></code> with <code class="docutils literal notranslate"><span class="pre">tectonic</span></code>, using the generated <code class="docutils literal notranslate"><span class="pre">macros.tex</span></code> and the plot data, and returns the path of <code class="docutils literal notranslate"><span class="pre">paper.pdf</span></code>. This is the final output of the workflow.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">paper_output</span> <span class="o">=</span> <span class="n">compile_paper</span><span class="p">(</span>
@@ -538,6 +639,7 @@
 </div>
 </div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">wf.draw()</span></code> renders the assembled node graph, and <code class="docutils literal notranslate"><span class="pre">write_workflow_json()</span></code> exports it, via <code class="docutils literal notranslate"><span class="pre">wf.graph_as_dict</span></code>, to the PWD <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> format.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
@@ -722,6 +824,8 @@
 </div>
 </div>
 </div>
+<p>The exported <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> contains six <code class="docutils literal notranslate"><span class="pre">function</span></code> nodes, one for each step, and two <code class="docutils literal notranslate"><span class="pre">input</span></code> nodes, <code class="docutils literal notranslate"><span class="pre">domain_size</span></code> and <code class="docutils literal notranslate"><span class="pre">source_directory</span></code>. A single <code class="docutils literal notranslate"><span class="pre">output</span></code> node holds the result of <code class="docutils literal notranslate"><span class="pre">compile_paper</span></code>. Each input node appears only once even though it is used several times. For example, the <code class="docutils literal notranslate"><span class="pre">source_directory</span></code> node has edges to five of the six functions. Entries of returned dictionaries, such as <code class="docutils literal notranslate"><span class="pre">xdmf_file</span></code> or <code class="docutils literal notranslate"><span class="pre">numdofs</span></code>, are selected through the <code class="docutils literal notranslate"><span class="pre">sourcePort</span></code> of the edges.</p>
+<p>Because the file only refers to the Python functions in <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code>, the same workflow can be run with any workflow engine supported by the <a class="reference external" href="https://pythonworkflow.github.io/python-workflow-definition/">Python Workflow Definition</a>, or explored visually again with <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> as in the first part of this notebook.</p>
 </section>
 </section>
 

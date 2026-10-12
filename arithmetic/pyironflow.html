@@ -358,8 +358,58 @@
   <section class="tex2jax_ignore mathjax_ignore" id="arithmetic-workflow">
 <h1>Arithmetic Workflow<a class="headerlink" href="#arithmetic-workflow" title="Link to this heading">#</a></h1>
 <p>This notebook defines and reloads the arithmetic workflow with <a class="reference external" href="https://github.com/pyiron/pyironflow"><code class="docutils literal notranslate"><span class="pre">pyironflow</span></code></a> .</p>
+<p>The arithmetic workflow is the smallest example of the <a class="reference external" href="https://pythonworkflow.github.io/python-workflow-definition/">Python Workflow Definition (PWD)</a>. It does no real science. Instead, it shows the building blocks that every PWD workflow shares. The workflow combines three Python functions, which are defined in the <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code> module next to this notebook:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Inputs</p></th>
+<th class="head"><p>Returns</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_prod_and_div(x,</span> <span class="pre">y)</span></code></p></td>
+<td><p>two numbers</p></td>
+<td><p>a dictionary <code class="docutils literal notranslate"><span class="pre">{&quot;prod&quot;:</span> <span class="pre">x</span> <span class="pre">*</span> <span class="pre">y,</span> <span class="pre">&quot;div&quot;:</span> <span class="pre">x</span> <span class="pre">/</span> <span class="pre">y}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_sum(x,</span> <span class="pre">y)</span></code></p></td>
+<td><p>two numbers</p></td>
+<td><p>the sum <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_square(x)</span></code></p></td>
+<td><p>one number</p></td>
+<td><p>the square <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">**</span> <span class="pre">2</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Written as a regular Python function, the workflow is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">arithmetic_workflow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">tmp_dict</span> <span class="o">=</span> <span class="n">get_prod_and_div</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">tmp_sum</span> <span class="o">=</span> <span class="n">get_sum</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">tmp_dict</span><span class="p">[</span><span class="s2">"prod"</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">tmp_dict</span><span class="p">[</span><span class="s2">"div"</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">get_square</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">tmp_sum</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the PWD, a workflow is stored in three files:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow.py</span></code>: the Python functions, which become the nodes of the workflow graph.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>: the connections between those functions (the edges), plus the input values and the final output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">environment.yml</span></code>: the conda environment with the software the functions need. For this website it is shared by all three examples and lives in the root of the repository.</p></li>
+</ul>
+<p>The same workflow is also implemented with other workflow engines, including <a class="reference external" href="https://www.aiida.net">AiiDA</a>, <a class="reference external" href="https://github.com/materialsproject/jobflow">jobflow</a> and <a class="reference external" href="https://github.com/pyiron/pyiron_base">pyiron_base</a>, on the <a class="reference external" href="https://pythonworkflow.github.io/python-workflow-definition/">Python Workflow Definition website</a>. This notebook adds a visual programming environment to that list. <a class="reference external" href="https://github.com/pyiron/pyironflow"><code class="docutils literal notranslate"><span class="pre">pyironflow</span></code></a> is a graphical user interface based on <a class="reference external" href="https://reactflow.dev">ReactFlow</a>. It runs inside Jupyter and works on top of the <a class="reference external" href="https://github.com/pyiron/pyiron_workflow"><code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code></a> workflow engine.</p>
+<p>The notebook has two parts:</p>
+<ol class="arabic simple">
+<li><p><strong>Reload workflow in pyironflow:</strong> load the existing <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> into <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> and run it.</p></li>
+<li><p><strong>Define workflow in pyironflow:</strong> build the same workflow with the <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> Python interface and export it to <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>. This shows how the JSON file in the first part was created.</p></li>
+</ol>
 <section id="reload-workflow-in-pyironflow">
 <h2>Reload workflow in pyironflow<a class="headerlink" href="#reload-workflow-in-pyironflow" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">python_workflow_definition</span></code> package provides an import and export module for each supported workflow engine. <code class="docutils literal notranslate"><span class="pre">load_workflow_json()</span></code> from <code class="docutils literal notranslate"><span class="pre">python_workflow_definition.pyiron_workflow</span></code> does the following:</p>
+<ol class="arabic simple">
+<li><p>Reads <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>.</p></li>
+<li><p>Imports the Python functions named in the <code class="docutils literal notranslate"><span class="pre">value</span></code> fields of the function nodes, for example <code class="docutils literal notranslate"><span class="pre">workflow.get_sum</span></code>. The module <code class="docutils literal notranslate"><span class="pre">workflow</span></code> refers to <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code> in the current directory.</p></li>
+<li><p>Returns a <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> <code class="docutils literal notranslate"><span class="pre">Workflow</span></code> object in which these functions are connected exactly as the edges in the JSON file describe.</p></li>
+</ol>
+<p>The resulting workflow object is then passed to <code class="docutils literal notranslate"><span class="pre">PyironFlow</span></code>. <code class="docutils literal notranslate"><span class="pre">PyironFlow</span></code> takes a list of workflows and shows each one in its own tab of the graphical user interface (<code class="docutils literal notranslate"><span class="pre">.gui</span></code>).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">workflow_json_filename</span> <span class="o">=</span> <span class="s2">"workflow.json"</span>
@@ -391,7 +441,34 @@
 <div class="cell_output docutils container">
 <script type="application/vnd.jupyter.widget-view+json">{"model_id": "3d05e6506ae6466c8d988f279bba365f", "version_major": 2, "version_minor": 0}</script></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> interface is an interactive Jupyter widget, so it only appears when the notebook runs in a live Jupyter session, for example on <a class="reference external" href="https://mybinder.org/v2/gh/pythonworkflow/visual-programming-with-pyironflow/HEAD">Binder</a>. For the static website, the screenshot below shows how the arithmetic workflow looks in <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code>:</p>
 <p><img alt="screenshot" src="../_images/screenshot.png" /></p>
+<p>The user interface of <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> is split into two parts:</p>
+<ul class="simple">
+<li><p><strong>Sidebar (left):</strong></p>
+<ul>
+<li><p><strong>Node Library</strong> lists Python functions that can be added to the workflow as new nodes.</p></li>
+<li><p><strong>Output</strong> shows the result of the most recent execution, including anything the Python functions print to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p></li>
+<li><p><strong>Logging Info</strong> collects log messages of the workflow engine.</p></li>
+</ul>
+</li>
+<li><p><strong>Canvas (right):</strong> each workflow is shown in its own tab. The buttons in the top left are <strong>Run</strong> (execute the whole workflow), <strong>Save</strong> and <strong>Load</strong> (write the workflow, including its results, to storage and read it back) and <strong>Delete</strong> (remove the saved copy from storage). The controls in the bottom left zoom and fit the view. The <strong>Reset Layout</strong> button arranges the nodes automatically, and the minimap below it helps you find your way around larger graphs.</p></li>
+</ul>
+<p>Each green box is a node, which is one Python function. Its input ports are on the left and its output ports on the right. Input values that do not come from another node can be edited in the fields next to the input ports. The lines between nodes are the edges of the workflow and show how data flows from one function to the next.</p>
+<p>Besides running the whole workflow, you can work with individual nodes:</p>
+<ul class="simple">
+<li><p><strong>Pull</strong> runs a node together with all upstream nodes it depends on.</p></li>
+<li><p><strong>Push</strong> runs a node and all downstream nodes that depend on it.</p></li>
+<li><p><strong>Reset</strong> clears the cached results of a node.</p></li>
+<li><p>The right-click menu offers <strong>View Output</strong>, which shows a node’s outputs without running it, and <strong>View Source</strong>, which shows the Python source code behind the node.</p></li>
+</ul>
+<p>These options make it easy to inspect intermediate results while debugging a workflow.</p>
+<p>For the arithmetic workflow, the graph reads from left to right:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_prod_and_div</span></code> receives the inputs <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>. The input nodes of <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> do not appear as separate boxes. Their values are set directly on the input ports of the function that uses them.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_prod_and_div</span></code> returns one dictionary. <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> inserts two small <code class="docutils literal notranslate"><span class="pre">injected_GetItem</span></code> nodes to extract the <code class="docutils literal notranslate"><span class="pre">&quot;prod&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;div&quot;</span></code> entries. In <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code>, the same step is stored more compactly as the <code class="docutils literal notranslate"><span class="pre">sourcePort</span></code> of an edge.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_sum</span></code> adds the two entries, and <code class="docutils literal notranslate"><span class="pre">get_square</span></code> squares the sum. The output of <code class="docutils literal notranslate"><span class="pre">get_square</span></code> is the result of the workflow.</p></li>
+</ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
@@ -404,9 +481,17 @@
 </div>
 </div>
 </div>
+<p>The workflow can also run directly from Python, without the graphical user interface, by calling <code class="docutils literal notranslate"><span class="pre">wf.run()</span></code>. For the inputs <code class="docutils literal notranslate"><span class="pre">x=1</span></code> and <code class="docutils literal notranslate"><span class="pre">y=2</span></code> the steps are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_prod_and_div(x=1,</span> <span class="pre">y=2)</span></code> returns <code class="docutils literal notranslate"><span class="pre">{&quot;prod&quot;:</span> <span class="pre">2,</span> <span class="pre">&quot;div&quot;:</span> <span class="pre">0.5}</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_sum(x=2,</span> <span class="pre">y=0.5)</span></code> returns <code class="docutils literal notranslate"><span class="pre">2.5</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_square(x=2.5)</span></code> returns <code class="docutils literal notranslate"><span class="pre">6.25</span></code>.</p></li>
+</ul>
+<p>The keys of the returned dictionary follow the pattern <code class="docutils literal notranslate"><span class="pre">&lt;node</span> <span class="pre">label&gt;__&lt;output</span> <span class="pre">label&gt;</span></code>. That is why the final result appears as <code class="docutils literal notranslate"><span class="pre">get_square__get_square</span></code>.</p>
 </section>
 <section id="define-workflow-in-pyironflow">
 <h2>Define workflow in pyironflow<a class="headerlink" href="#define-workflow-in-pyironflow" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> is a graphical front end for the <a class="reference external" href="https://github.com/pyiron/pyiron_workflow"><code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code></a> workflow engine. A workflow can be built by hand in the GUI, but it can also be defined in Python with the <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> interface, as shown here. Running this part of the notebook rebuilds the workflow from <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code> and overwrites <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> with the result.</p>
 <p><code class="docutils literal notranslate"><span class="pre">to_function_node</span></code> wraps a plain Python function into a <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> node that can be added to a <code class="docutils literal notranslate"><span class="pre">Workflow</span></code> graph. Nodes are assembled into a graph with attribute access: assigning <code class="docutils literal notranslate"><span class="pre">wf.&lt;name&gt;</span> <span class="pre">=</span> <span class="pre">node(...)</span></code> both registers the node under that name and connects its inputs to the outputs of other nodes already on the graph.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -422,6 +507,7 @@
 </div>
 </div>
 </div>
+<p>The functions are imported from <code class="docutils literal notranslate"><span class="pre">workflow.py</span></code> under names with a leading underscore. This keeps the plain names free for the node classes created in the next step. Because the functions themselves are left unchanged, the exported <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> still refers to the original functions, for example <code class="docutils literal notranslate"><span class="pre">workflow.get_sum</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">workflow</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -433,6 +519,7 @@
 </div>
 </div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">to_function_node()</span></code> takes three arguments: the name of the new node class, the Python function it wraps, and the label of its output. Each function has a single output, which is labelled with the function name. This label is what appears as <code class="docutils literal notranslate"><span class="pre">get_square__get_square</span></code> in the result of <code class="docutils literal notranslate"><span class="pre">wf.run()</span></code> above.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_prod_and_div</span> <span class="o">=</span> <span class="n">to_function_node</span><span class="p">(</span><span class="s2">"get_prod_and_div"</span><span class="p">,</span> <span class="n">_get_prod_and_div</span><span class="p">,</span> <span class="s2">"get_prod_and_div"</span><span class="p">)</span>
@@ -449,6 +536,14 @@
 </div>
 </div>
 </div>
+<p>The next cell defines the data flow of the workflow:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">wf.x</span></code> and <code class="docutils literal notranslate"><span class="pre">wf.y</span></code> hold the input values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">wf.prod_and_div</span></code> calls <code class="docutils literal notranslate"><span class="pre">get_prod_and_div</span></code> with these inputs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">wf.prod_and_div[&quot;prod&quot;]</span></code> and <code class="docutils literal notranslate"><span class="pre">wf.prod_and_div[&quot;div&quot;]</span></code> select the two entries of the returned dictionary and pass them to <code class="docutils literal notranslate"><span class="pre">get_sum</span></code>. This indexing is what creates the <code class="docutils literal notranslate"><span class="pre">injected_GetItem</span></code> nodes seen in the <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code> screenshot.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_square</span></code> squares the sum.</p></li>
+</ul>
+<p>None of the functions are executed at this point. The cell only records how the outputs of one function are connected to the inputs of the next.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wf</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
@@ -564,6 +659,18 @@
 </div>
 </div>
 </div>
+<p>The exported <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> has two lists:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">nodes</span></code></strong> describes every node of the graph by its <code class="docutils literal notranslate"><span class="pre">id</span></code> and <code class="docutils literal notranslate"><span class="pre">type</span></code>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">function</span></code> nodes refer to a Python function as <code class="docutils literal notranslate"><span class="pre">module.function</span></code> in their <code class="docutils literal notranslate"><span class="pre">value</span></code> field, for example <code class="docutils literal notranslate"><span class="pre">workflow.get_prod_and_div</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input</span></code> nodes hold a <code class="docutils literal notranslate"><span class="pre">name</span></code> and a default <code class="docutils literal notranslate"><span class="pre">value</span></code>, here <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">2</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">output</span></code> node, named <code class="docutils literal notranslate"><span class="pre">result</span></code>, marks the final result of the workflow.</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">edges</span></code></strong> connects the nodes. Each edge goes from a <code class="docutils literal notranslate"><span class="pre">source</span></code> node to a <code class="docutils literal notranslate"><span class="pre">target</span></code> node. The optional <code class="docutils literal notranslate"><span class="pre">sourcePort</span></code> picks one entry from the returned dictionary, for example <code class="docutils literal notranslate"><span class="pre">&quot;prod&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;div&quot;</span></code>. A <code class="docutils literal notranslate"><span class="pre">sourcePort</span></code> of <code class="docutils literal notranslate"><span class="pre">null</span></code> means the whole return value is passed on. The <code class="docutils literal notranslate"><span class="pre">targetPort</span></code> names the function argument that receives the value.</p></li>
+</ul>
+<p>This file does not depend on any workflow engine. The <code class="docutils literal notranslate"><span class="pre">injected_GetItem</span></code> nodes of <code class="docutils literal notranslate"><span class="pre">pyiron_workflow</span></code> are not stored as nodes. They are translated into the <code class="docutils literal notranslate"><span class="pre">sourcePort</span></code> of the corresponding edges. As a result, the same <code class="docutils literal notranslate"><span class="pre">workflow.json</span></code> can be loaded with any workflow engine supported by the Python Workflow Definition, and in the other direction, a workflow defined with another engine can be explored in <code class="docutils literal notranslate"><span class="pre">pyironflow</span></code>. The other implementations of this example are in the <a class="reference external" href="https://github.com/pythonworkflow/python-workflow-definition/tree/main/example_workflows/arithmetic">Python Workflow Definition repository</a>.</p>
 </section>
 </section>
 
