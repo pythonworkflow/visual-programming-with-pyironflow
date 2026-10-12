@@ -318,13 +318,21 @@
 <h1>Visual Programming<a class="headerlink" href="#visual-programming" title="Link to this heading">#</a></h1>
 <p><a class="reference external" href="https://mybinder.org/v2/gh/pythonworkflow/visual-programming-with-pyironflow/HEAD"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a></p>
 <p><img alt="screenshot" src="_images/screenshot.png" /></p>
-<p>Load the <a class="reference external" href="https://pythonworkflow.github.io">Python Workflow Definition</a> with the visual programming environment <a class="reference external" href="https://github.com/pyiron/pyironflow">pyironflow</a>.</p>
+<p>Load the <a class="reference external" href="https://pythonworkflow.github.io">Python Workflow Definition</a> with the visual programming environment <a class="reference external" href="https://github.com/pyiron/pyironflow">pyironflow</a>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyironflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">PyironFlow</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">python_workflow_definition.pyiron_workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_workflow_json</span>
 
 <span class="n">PyironFlow</span><span class="p">([</span><span class="n">load_workflow_json</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s2">"workflow.json"</span><span class="p">)])</span><span class="o">.</span><span class="n">gui</span>
 </pre></div>
 </div>
+<p>The main motivation for supporting visual programming environments with the Python Workflow Definition is that they simplify the discussion of workflows.
+When we introduce a new workflow, we commonly illustrate it as data flow diagram. A visual programming environment allows you to:</p>
+<ul class="simple">
+<li><p>Browse through the workflow and zoom in on individual parts to analyze which data is transferred between the different steps.</p></li>
+<li><p>Furthermore, a visual programming environment enables debugging the data flow, by allowing the user to execute individual steps, or the workflow up to a specific step and print the data at a given step.</p></li>
+<li><p>Finally, for technically less inclined users a visual programming environment provides the ability to use workflow developed by experts. This accelerates the knowledge transfer between different user groups.</p></li>
+</ul>
+<p>In conclusion the visual programming approach provides an alternative perspective to working with the Python Workflow Definition.</p>
 <div class="toctree-wrapper compound">
 </div>
 </section>
